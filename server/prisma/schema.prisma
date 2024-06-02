@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  name     String
+  permissions Json
+  rankName String
+  sessions Session[]
+  lessons Lesson[]
+  platoons UserPlatoonSync[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  sid       String   @unique
+  data      String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  title       String
+  fileLocation String
+  staticViewCode String
+  platoonId  Int
+  platoon    Platoon  @relation(fields: [platoonId], references: [id])
+  presentationDate DateTime
+  presenterId Int
+  presenter   User     @relation(fields: [presenterId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Platoon {
+  id        Int      @id @default(autoincrement())
+  name      String
+  lessons  Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users    UserPlatoonSync[]
+}
+
+model UserPlatoonSync {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  platoonId Int
+  platoon   Platoon  @relation(fields: [platoonId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
